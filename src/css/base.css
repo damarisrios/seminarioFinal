@@ -1,0 +1,51 @@
+#root {
+    width: auto;
+    font-family: "Poppins", sans-serif;
+}
+
+.background {
+    background-image: url('../assets/background.jpg');
+    background-size: cover; 
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.single-form {
+    width: 60%;
+}
+
+.content-box{
+    width: 40%;
+}
+
+.div-form {
+    padding-right: 3rem !important;
+}
+
+.content-view{
+    padding: 3rem !important;
+}
+
+h1, h2, h3 {
+    font-weight: bold !important;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.btn {
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.card{
+    box-shadow: 0 4px 12px rgb(0 0 0 / 22%);
+    transition: box-shadow 0.3s ease;
+}
+

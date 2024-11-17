@@ -1,0 +1,42 @@
+.card-home{
+    width: 80%;
+}
+
+.icon {
+    color: #C70039;
+}
+
+.btn-home {
+    background-color: white;               
+    border: 2px solid #C70039;             
+    color: #C70039;                        
+    padding: 10px 20px;                    
+    font-size: 16px;                       
+    cursor: pointer;                       
+    transition: all 0.3s ease;              
+    border-radius: 5px; 
+}
+
+.btn-home:hover {
+    background-color: #C70039;             
+    color: white;                          
+    border-color: #C70039;                 
+}
+  
+.btn-home:active {
+    background-color: #C70039;             
+    color: white;                          
+    border-color: #C70039;                 
+}
+ 
+hr{
+    width: 80%;
+    border-top: 1px solid #8f032b;
+    opacity: 0.5;
+}
+
+.first-title{
+    font-family: "Edu AU VIC WA NT Pre", cursive;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
