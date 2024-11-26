@@ -32,4 +32,4 @@ npm run dev
 
 # Visualización
 Para ver el proyecto en funcionamiento, se debe entrar desde el navegador web al puerto 5174, ingresando la siguiente de url;
-([http::localhost:5174](http://localhost:5174/))
+([http://localhost:5174](http://localhost:5174/))
