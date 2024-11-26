@@ -9,7 +9,7 @@ Antes de proceder con la instalación, asegúrese de cumplir con los siguientes 
 
 Versión de Node.js requerida: 18.8 o superior (puede verificar la versión instalada ejecutando node -v en la terminal).
 
-# 3. Instalación del sistema
+# 3. Instalación y ejecución del sistema
 Para instalar y ejecutar el sistema;
 
 ## 3.1. Clonación del Repositorio
