@@ -2,6 +2,7 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Heart, Apple, Utensils } from 'lucide-react';
 import "../css/homePage.css";
+import { Link } from 'react-router-dom';
 
 const HomePage: React.FC = () => {
   return (
@@ -9,11 +10,11 @@ const HomePage: React.FC = () => {
       <div className="card border-0  card-home">
         <div className="card-body p-0">
           <div className="row g-0">
-            <div className="col-md-6 d-flex flex-wrap justify-content-center align-content-center">
+            <div className="col-md-6 d-flex p-4 flex-wrap justify-content-center align-content-center div-img">
               <img
                 src="src\assets\forms.jpg"
                 alt="Heart shaped dish with pomegranate seeds"
-                className="img-fluid rounded-start h-75"
+                className="w-100 rounded"
                 style={{ objectFit: 'cover' }}
               />
             </div>
@@ -36,8 +37,8 @@ const HomePage: React.FC = () => {
                         </span>
                     </div>
                     <div className="text-center d-flex flex-row align-items-center my-2">
-                        <button className="btn-home btn-lg me-3 mb-3">Iniciar Sesión</button>
-                        <button className="btn-home btn-lg mb-3">Registrarse</button>
+                        <Link to="/login" className="btn-home btn-lg me-3 mb-3">Iniciar Sesión</Link>
+                        <Link to="/register" className="btn-home btn-lg mb-3">Registrarse</Link>
                     </div>
                 </div>
             </div>

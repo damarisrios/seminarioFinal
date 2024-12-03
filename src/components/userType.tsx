@@ -11,11 +11,11 @@ const UserTypeSelection: React.FC<UserTypeSelectionProps> = ({ onSelectType = ()
       <div className="card border-0  single-form">
         <div className="card-body p-0">
           <div className="row g-0">
-            <div className="col-md-6 d-flex flex-wrap justify-content-center align-content-center">
+            <div className="col-md-6 d-flex flex-wrap p-4 justify-content-center align-content-center div-img">
               <img
                 src="src\assets\forms.jpg"
                 alt="Heart shaped dish with pomegranate seeds"
-                className="img-fluid rounded-start h-75"
+                className="w-100 rounded"
                 style={{ objectFit: 'cover' }}
               />
             </div>
