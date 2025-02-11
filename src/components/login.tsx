@@ -105,7 +105,7 @@ const LoginRegistrationForm: React.FC = () => {
                     </button>
                     <p className="text-center">
                       ¿No tienes una cuenta?{' '}
-                      <button type="button" className="btn btn-link p-0" onClick={() => setIsLogin(false)}>
+                      <button type="button" className="btn btn-link mt-1 p-0" onClick={() => setIsLogin(false)}>
                         Regístrate
                       </button>
                     </p>
@@ -169,18 +169,17 @@ const LoginRegistrationForm: React.FC = () => {
                         />
                       </div>
                       <div className="col-12">
-                        <select 
-                          className="form-select"
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Edad"
                           name="age"
                           value={registrationData.age}
                           onChange={handleRegistrationChange}
+                          min="18"
+                          max="99"
                           required
-                        >
-                          <option value="">Edad</option>
-                          {Array.from({ length: 83 }, (_, i) => i + 18).map(age => (
-                            <option key={age} value={age}>{age}</option>
-                          ))}
-                        </select>
+                        />
                       </div>
                       <div className="col-12">
                         <input
@@ -212,7 +211,7 @@ const LoginRegistrationForm: React.FC = () => {
                     </div>
                     <p className="text-center mt-3">
                       ¿Ya tienes una cuenta?{' '}
-                      <button type="button" className="btn btn-link p-0" onClick={() => setIsLogin(true)}>
+                      <button type="button" className="btn btn-link mt-1 p-0" onClick={() => setIsLogin(true)}>
                         Inicia sesión
                       </button>
                     </p>

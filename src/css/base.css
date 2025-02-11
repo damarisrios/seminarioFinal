@@ -52,37 +52,39 @@ h1, h2, h3, h4, h5, h6, p {
     box-shadow: 0 4px 12px rgb(0 0 0 / 22%);
     transition: box-shadow 0.3s ease;
 }
-
+  
 .btn-link {
-    background-image: linear-gradient(
-        to right,
-        #C70039,
-        #C70039 50%,
-        #57021a 50%
-      );
-      background-size: 200% 100%;
-      background-position: -100%;
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      transition: all 0.3s ease-in-out;
-}
-
-.btn-link:before {
-    content: '';
-    background: #C70039;
-    display: block;
-    position: absolute;
-    bottom: -3px;
-    left: 0;
-    width: 0;
-    height: 3px;
+    color: #C70039;
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
 }
 
 .btn-link:hover {
-    background-position: 0;
+    color: #C70039;
 }
 
-.btn-link:hover::before {
+.btn-link::after,
+.btn-link::before {
+    content: '';
+    position: absolute;
     width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, #c7003865, #C70039);
+    bottom: -3px;
+    left: 0;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s ease-out;
 }
+
+.btn-link::before {
+    top: -3px;
+    transform-origin: left;
+}
+
+.btn-link:hover::after,
+.btn-link:hover::before {
+    transform: scaleX(1);
+}
+  
