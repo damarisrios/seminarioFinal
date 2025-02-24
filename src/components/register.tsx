@@ -38,7 +38,7 @@ const RegistrationForm: React.FC = () => {
   };
 
   return (
-    <div className="container min-vh-100 d-flex align-items-center justify-content-center">
+    <div className="container min-vh-100 my-3 d-flex align-items-center justify-content-center">
       <div className="card border-0  single-form">
         <div className="card-body p-0">
           <div className="row g-0">

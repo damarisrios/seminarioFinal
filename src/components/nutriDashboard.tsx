@@ -50,7 +50,7 @@ const NutritionistDashboard: React.FC = () => {
                 </div>
             </div>
         </section>
-        <section className="gap-4 d-flex flex-row justify-content-center">
+        <section className="gap-4 d-flex flex-row justify-content-end">
             <div className="card border-0  content-box">
                 <div className="card-body p-0">
                     <div className="row g-0">
