@@ -26,10 +26,58 @@ const RegistrationForm: React.FC = () => {
     confirmPassword: ''
   });
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-  };
+  
+    // Validar que los emails y contraseñas coincidan
+    if (formData.email !== formData.confirmEmail) {
+      alert('Los correos electrónicos no coinciden');
+      return;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      alert('Las contraseñas no coinciden');
+      return;
+    }
+  
+    try {
+      const response = await fetch('http://localhost:3000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          nombre: formData.firstName,
+          apellido: formData.lastName,
+          edad: formData.age,
+          email: formData.email,
+          telefono: formData.phone,
+          contraseña: formData.password
+        })
+      });
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        alert('Registro exitoso');
+        setFormData({
+          firstName: '',
+          lastName: '',
+          username: '',
+          email: '',
+          confirmEmail: '',
+          age: '',
+          phone: '',
+          password: '',
+          confirmPassword: ''
+        });
+      } else {
+        alert('Error en el registro: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error en el servidor');
+    }
+  };  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
