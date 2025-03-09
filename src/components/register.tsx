@@ -10,6 +10,7 @@ interface FormData {
   age: string;
   password: string;
   confirmPassword: string;
+  phone: string;
 }
 
 const RegistrationForm: React.FC = () => {
@@ -21,6 +22,7 @@ const RegistrationForm: React.FC = () => {
     confirmEmail: '',
     age: '',
     password: '',
+    phone: '',
     confirmPassword: ''
   });
 
@@ -35,7 +37,7 @@ const RegistrationForm: React.FC = () => {
       ...prev,
       [name]: value
     }));
-  };
+   };
 
   return (
     <div className="container min-vh-100 my-3 d-flex align-items-center justify-content-center">
@@ -117,6 +119,17 @@ const RegistrationForm: React.FC = () => {
                         placeholder="Edad"
                         name="age"
                         value={formData.age}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                    <div className="col-12">
+                      <input 
+                        className="form-control"
+                        type="tel"
+                        placeholder="Telefono"
+                        name="phone"
+                        value={formData.phone}
                         onChange={handleChange}
                         required
                       />
