@@ -1,5 +1,6 @@
 import React, { useState, FormEvent } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useNavigate } from 'react-router-dom';
 
 interface FormData {
   firstName: string;
@@ -14,6 +15,8 @@ interface FormData {
 }
 
 const RegistrationForm: React.FC = () => {
+  const navigate = useNavigate()
+
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',
@@ -59,6 +62,7 @@ const RegistrationForm: React.FC = () => {
   
       if (data.success) {
         alert('Registro exitoso');
+        navigate("/userType")
         setFormData({
           firstName: '',
           lastName: '',
