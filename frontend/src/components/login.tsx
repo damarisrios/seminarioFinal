@@ -1,63 +1,46 @@
 import React, { useState, FormEvent } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-interface LoginData {
+interface FormData {
   email: string;
   password: string;
 }
 
-interface RegistrationData {
-  firstName: string;
-  lastName: string;
-  username: string;
-  email: string;
-  confirmEmail: string;
-  age: string;
-  password: string;
-  confirmPassword: string;
-}
-
-const LoginRegistrationForm: React.FC = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [loginData, setLoginData] = useState<LoginData>({
+const LoginForm: React.FC = () => {
+  const [formData, setFormData] = useState<FormData>({
     email: '',
     password: ''
   });
-  const [registrationData, setRegistrationData] = useState<RegistrationData>({
-    firstName: '',
-    lastName: '',
-    username: '',
-    email: '',
-    confirmEmail: '',
-    age: '',
-    password: '',
-    confirmPassword: ''
-  });
 
-  const handleLoginSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log('Login submitted:', loginData);
-  };
-
-  const handleRegistrationSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log('Registration submitted:', registrationData);
-  };
-
-  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setLoginData(prev => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
-  const handleRegistrationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setRegistrationData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          contraseña: formData.password
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert('logueado');
+        // para testear el inicio de sesión
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error de conexión a la bd');
+    }
   };
 
   return (
@@ -65,7 +48,7 @@ const LoginRegistrationForm: React.FC = () => {
       <div className="card border-0  single-form">
         <div className="card-body p-0">
           <div className="row g-0">
-          <div className="col-md-6 d-flex flex-wrap p-4 justify-content-center align-content-center div-img">
+            <div className="col-md-6 d-flex flex-wrap p-4 justify-content-center align-content-center div-img">
               <img
                 src="src\assets\forms.jpg"
                 alt="Heart shaped dish with pomegranate seeds"
@@ -75,148 +58,40 @@ const LoginRegistrationForm: React.FC = () => {
             </div>
             <div className="col-md-6 d-flex flex-wrap align-content-center">
               <div className="p-4 w-100 div-form">
-                <h2 className="text-center mb-4">{isLogin ? 'INICIAR SESIÓN' : 'REGISTRO'}</h2>
-                {isLogin ? (
-                  <form onSubmit={handleLoginSubmit}>
-                    <div className="mb-3">
-                      <input
-                        type="email"
-                        className="form-control"
-                        placeholder="Dirección de email"
-                        name="email"
-                        value={loginData.email}
-                        onChange={handleLoginChange}
-                        required
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <input
-                        type="password"
-                        className="form-control"
-                        placeholder="Contraseña"
-                        name="password"
-                        value={loginData.password}
-                        onChange={handleLoginChange}
-                        required
-                      />
-                    </div>
-                    <button type="submit" className="btn btn-dark w-100 py-2 mb-3">
-                      Iniciar sesión
+                <h2 className="text-center mb-4">INICIAR SESIÓN</h2>
+                <form onSubmit={handleSubmit}>
+                  <div className="mb-3">
+                    <input
+                      type="email"
+                      className="form-control"
+                      placeholder="Dirección de email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <input
+                      type="password"
+                      className="form-control"
+                      placeholder="Contraseña"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-dark w-100 py-2 mb-3">
+                    Iniciar sesión
+                  </button>
+                  <p className="text-center">
+                    ¿No tienes una cuenta?{' '}
+                    <button type="button" className="btn btn-link mt-1 p-0">
+                      Regístrate
                     </button>
-                    <p className="text-center">
-                      ¿No tienes una cuenta?{' '}
-                      <button type="button" className="btn btn-link mt-1 p-0" onClick={() => setIsLogin(false)}>
-                        Regístrate
-                      </button>
-                    </p>
-                  </form>
-                ) : (
-                  <form onSubmit={handleRegistrationSubmit}>
-                    <div className="row g-3">
-                      <div className="col-6">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Nombre"
-                          name="firstName"
-                          value={registrationData.firstName}
-                          onChange={handleRegistrationChange}
-                          required
-                        />
-                      </div>
-                      <div className="col-6">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Apellido"
-                          name="lastName"
-                          value={registrationData.lastName}
-                          onChange={handleRegistrationChange}
-                          required
-                        />
-                      </div>
-                      <div className="col-12">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Nombre de usuario"
-                          name="username"
-                          value={registrationData.username}
-                          onChange={handleRegistrationChange}
-                          required
-                        />
-                      </div>
-                      <div className="col-12">
-                        <input
-                          type="email"
-                          className="form-control"
-                          placeholder="Dirección de email"
-                          name="email"
-                          value={registrationData.email}
-                          onChange={handleRegistrationChange}
-                          required
-                        />
-                      </div>
-                      <div className="col-12">
-                        <input
-                          type="email"
-                          className="form-control"
-                          placeholder="Confirmar email"
-                          name="confirmEmail"
-                          value={registrationData.confirmEmail}
-                          onChange={handleRegistrationChange}
-                          required
-                        />
-                      </div>
-                      <div className="col-12">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Edad"
-                          name="age"
-                          value={registrationData.age}
-                          onChange={handleRegistrationChange}
-                          min="18"
-                          max="99"
-                          required
-                        />
-                      </div>
-                      <div className="col-12">
-                        <input
-                          type="password"
-                          className="form-control"
-                          placeholder="Contraseña"
-                          name="password"
-                          value={registrationData.password}
-                          onChange={handleRegistrationChange}
-                          required
-                        />
-                      </div>
-                      <div className="col-12">
-                        <input
-                          type="password"
-                          className="form-control"
-                          placeholder="Confirmar contraseña"
-                          name="confirmPassword"
-                          value={registrationData.confirmPassword}
-                          onChange={handleRegistrationChange}
-                          required
-                        />
-                      </div>
-                      <div className="col-12">
-                        <button type="submit" className="btn btn-dark w-100 py-2">
-                          Registrarse
-                        </button>
-                      </div>
-                    </div>
-                    <p className="text-center mt-3">
-                      ¿Ya tienes una cuenta?{' '}
-                      <button type="button" className="btn btn-link mt-1 p-0" onClick={() => setIsLogin(true)}>
-                        Inicia sesión
-                      </button>
-                    </p>
-                  </form>
-                )}
+                  </p>
+                </form>
               </div>
             </div>
           </div>
@@ -226,4 +101,4 @@ const LoginRegistrationForm: React.FC = () => {
   );
 };
 
-export default LoginRegistrationForm;
+export default LoginForm;
