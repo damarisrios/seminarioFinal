@@ -1,19 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import UserMeasures from './UserMeasures';
+import NutriFile from './NutriFile';
 
-interface UserTypeSelectionProps {
-  onSelectType?: (type: 'user' | 'nutritionist') => void;
-}
+const UserTypeSelection: React.FC = () => {
+  const [selectedType, setSelectedType] = useState<'user' | 'nutritionist' | null>(null);
 
-const UserTypeSelection: React.FC<UserTypeSelectionProps> = ({ onSelectType = () => {} }) => {
+  const handleSelectType = (type: 'user' | 'nutritionist') => {
+    localStorage.setItem('userType', type); // Opcional: guardar para usar después
+    setSelectedType(type);
+  };
+
+  if (selectedType === 'user') return <UserMeasures />;
+  if (selectedType === 'nutritionist') return <NutriFile />;
+
   return (
     <div className="container min-vh-100 d-flex align-items-center justify-content-center">
-      <div className="card border-0  single-form">
+      <div className="card border-0 single-form">
         <div className="card-body p-0">
           <div className="row g-0">
             <div className="col-md-6 d-flex flex-wrap p-4 justify-content-center align-content-center div-img">
               <img
-                src="src\assets\forms.jpg"
+                src="src/assets/forms.jpg"
                 alt="Heart shaped dish with pomegranate seeds"
                 className="w-100 rounded"
                 style={{ objectFit: 'cover' }}
@@ -31,15 +39,15 @@ const UserTypeSelection: React.FC<UserTypeSelectionProps> = ({ onSelectType = ()
                   </p>
                 </div>
                 <div className="d-grid gap-3">
-                  <button 
+                  <button
                     className="btn btn-dark py-2"
-                    onClick={() => onSelectType('user')}
+                    onClick={() => handleSelectType('user')}
                   >
                     Usuario →
                   </button>
-                  <button 
+                  <button
                     className="btn btn-dark py-2"
-                    onClick={() => onSelectType('nutritionist')}
+                    onClick={() => handleSelectType('nutritionist')}
                   >
                     Nutricionista →
                   </button>
