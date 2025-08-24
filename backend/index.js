@@ -197,6 +197,59 @@ app.put('/paciente/:id', async (req, res) => {
 });
 
 //Cambiar contraseña
+app.put('/usuarios/:id/password', async (req, res) => {
+  const { id } = req.params;
+  // En el body usamos claves sin tilde para evitar problemas en JSON
+  const { contrasena_actual, contrasena_nueva } = req.body;
+
+  if (!contrasena_actual || !contrasena_nueva) {
+    return res.status(400).json({ success: false, message: 'Datos incompletos' });
+  }
+  if (contrasena_nueva.length < 6) {
+    return res.status(400).json({ success: false, message: 'La nueva contraseña debe tener al menos 6 caracteres' });
+  }
+
+  try {
+    // 1) Traer hash actual desde la columna `contraseña`
+    const [rows] = await db.query(
+      'SELECT `contraseña` FROM Usuario WHERE usuario_id = ? LIMIT 1',
+      [id]
+    );
+    if (!rows.length) {
+      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+    }
+
+    const hashActual = rows[0]['contraseña']; // usar bracket notation por el tilde
+    if (!hashActual) {
+      return res.status(500).json({ success: false, message: 'Hash de contraseña no encontrado' });
+    }
+
+    // 2) Verificar contraseña actual
+    const ok = await bcrypt.compare(contrasena_actual, hashActual);
+    if (!ok) {
+      return res.status(401).json({ success: false, message: 'La contraseña actual es incorrecta' });
+    }
+
+    if (contrasena_actual === contrasena_nueva) {
+      return res.status(400).json({ success: false, message: 'La nueva contraseña no puede ser igual a la actual' });
+    }
+
+    // 3) Hashear y guardar nueva contraseña
+    const newHash = await bcrypt.hash(contrasena_nueva, 10);
+    const [upd] = await db.query(
+      'UPDATE Usuario SET `contraseña` = ? WHERE usuario_id = ?',
+      [newHash, id]
+    );
+    if (upd.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Usuario no encontrado al actualizar' });
+    }
+
+    return res.json({ success: true, message: 'Contraseña actualizada correctamente' });
+  } catch (error) {
+    console.error('Error actualizando contraseña:', error);
+    return res.status(500).json({ success: false, message: 'Error del servidor' });
+  }
+});
 
 
 // Inicializar servidor

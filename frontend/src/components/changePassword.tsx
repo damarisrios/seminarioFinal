@@ -1,112 +1,176 @@
-import React, { useState } from 'react';
+import React, { useRef, useState, FormEvent } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import Toast from 'bootstrap/js/dist/toast';
+import { useNavigate } from 'react-router-dom';
 
 interface PasswordData {
-  password: string;
+  currentPassword: string;
+  newPassword: string;
   confirmPassword: string;
 }
 
 const PasswordChange: React.FC = () => {
-  const [passwordData, setPasswordData] = useState<PasswordData>({
-    password: '',
-    confirmPassword: ''
+  const [formData, setFormData] = useState<PasswordData>({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
   });
 
   const [error, setError] = useState<string>('');
+  const navigate = useNavigate();
+  const toastRef = useRef<HTMLDivElement>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setPasswordData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
     setError('');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-    if (passwordData.password !== passwordData.confirmPassword) {
-      setError('Las contraseñas no coinciden');
+
+    if (!formData.currentPassword) {
+      setError('Ingresá tu contraseña actual');
+      return;
+    }
+    if (formData.newPassword.length < 6) {
+      setError('La nueva contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+    if (formData.newPassword !== formData.confirmPassword) {
+      setError('Las contraseñas nuevas no coinciden');
       return;
     }
 
-    if (passwordData.password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      setError('No se encontró la sesión del usuario. Volvé a iniciar sesión.');
       return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:3000/usuarios/${userId}/password`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contrasena_actual: formData.currentPassword,
+          contrasena_nueva: formData.newPassword,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setError(data.message || 'No se pudo actualizar la contraseña');
+        return;
+      }
+
+      // === Igual que en editar usuario: toast y luego navigate ===
+      const toastEl = toastRef.current;
+      if (toastEl) {
+        const toast = new Toast(toastEl);
+        toast.show();
+        setTimeout(() => {
+          navigate('/dashboardU'); // mismo destino que usás en Modificar perfil
+        }, 2000);
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Error en el servidor / red. Verificá que el backend esté corriendo.');
     }
   };
 
   return (
     <div className="container min-vh-100 d-flex align-items-center justify-content-center">
-      <div className="card border-0  single-form">
+      <div className="card border-0 single-form">
         <div className="card-body p-0">
           <div className="row g-0">
             <div className="col-md-6 d-flex p-4 flex-wrap justify-content-center align-content-center div-img">
               <img
-                src="src\assets\forms.jpg"
+                src="src/assets/forms.jpg"  /* usar / en vez de \ */
                 alt="Heart shaped dish with pomegranate seeds"
                 className="w-100 rounded"
+                style={{ objectFit: 'cover' }}
               />
             </div>
             <div className="col-md-6 d-flex flex-wrap align-content-center">
               <div className="p-4 w-100 div-form">
-                  <h4 className="text-center mb-4"><strong>CAMBIAR CONTRASEÑA</strong></h4>
-                  <form onSubmit={handleSubmit}>
-                      <div className="mb-3">
-                          <label htmlFor="password" className="form-label">
-                              Contraseña actual:
-                          </label>
-                          <input
-                              type="password"
-                              className="form-control"
-                              id="password"
-                              name="password"
-                              value={passwordData.password}
-                              onChange={handleChange}
-                              required
-                          />
-                      </div>
-                      <div className="mb-3">
-                          <label htmlFor="password" className="form-label">
-                              Nueva contraseña:
-                          </label>
-                          <input
-                              type="password"
-                              className="form-control"
-                              id="password"
-                              name="password"
-                              value={passwordData.newPassword}
-                              onChange={handleChange}
-                              required
-                          />
-                      </div>
-                      <div className="mb-3">
-                          <label htmlFor="confirmPassword" className="form-label">
-                              Confirmar contraseña:
-                          </label>
-                          <input
-                              type="password"
-                              className="form-control"
-                              id="confirmPassword"
-                              name="confirmPassword"
-                              value={passwordData.confirmPassword}
-                              onChange={handleChange}
-                              required
-                          />
-                      </div>
-                      {error && (
-                      <div className="alert alert-danger" role="alert">
-                          {error}
-                      </div>
-                      )}
-                      <button type="submit" className="btn btn-dark w-100">
-                          Guardar cambios
-                      </button>
-                  </form>
+                <h4 className="text-center mb-4"><strong>CAMBIAR CONTRASEÑA</strong></h4>
+
+                <form onSubmit={handleSubmit}>
+                  <div className="mb-3">
+                    <label htmlFor="currentPassword" className="form-label">Contraseña actual:</label>
+                    <input
+                      type="password"
+                      className="form-control"
+                      id="currentPassword"
+                      name="currentPassword"
+                      value={formData.currentPassword}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label htmlFor="newPassword" className="form-label">Nueva contraseña:</label>
+                    <input
+                      type="password"
+                      className="form-control"
+                      id="newPassword"
+                      name="newPassword"
+                      value={formData.newPassword}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label htmlFor="confirmPassword" className="form-label">Confirmar nueva contraseña:</label>
+                    <input
+                      type="password"
+                      className="form-control"
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  {error && (
+                    <div className="alert alert-danger" role="alert">
+                      {error}
+                    </div>
+                  )}
+
+                  <button type="submit" className="btn btn-dark w-100">
+                    Guardar cambios
+                  </button>
+                </form>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Toast igual al de UserMeasures */}
+      <div
+        className="toast position-fixed bottom-0 end-0 m-3 text-bg-success"
+        role="alert"
+        ref={toastRef}
+        data-bs-delay="1500"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div className="d-flex">
+          <div className="toast-body">¡Contraseña actualizada con éxito!</div>
+          <button
+            type="button"
+            className="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
         </div>
       </div>
     </div>
