@@ -51,11 +51,11 @@ const PasswordChange: React.FC = () => {
             </div>
             <div className="col-md-6 d-flex flex-wrap align-content-center">
               <div className="p-4 w-100 div-form">
-                  <h2 className="text-center mb-4">CAMBIAR CONTRASEÑA</h2>
+                  <h4 className="text-center mb-4"><strong>CAMBIAR CONTRASEÑA</strong></h4>
                   <form onSubmit={handleSubmit}>
                       <div className="mb-3">
                           <label htmlFor="password" className="form-label">
-                              Contraseña:
+                              Contraseña actual:
                           </label>
                           <input
                               type="password"
@@ -63,6 +63,20 @@ const PasswordChange: React.FC = () => {
                               id="password"
                               name="password"
                               value={passwordData.password}
+                              onChange={handleChange}
+                              required
+                          />
+                      </div>
+                      <div className="mb-3">
+                          <label htmlFor="password" className="form-label">
+                              Nueva contraseña:
+                          </label>
+                          <input
+                              type="password"
+                              className="form-control"
+                              id="password"
+                              name="password"
+                              value={passwordData.newPassword}
                               onChange={handleChange}
                               required
                           />
