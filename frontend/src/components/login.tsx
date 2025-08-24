@@ -39,8 +39,8 @@ const LoginForm: React.FC = () => {
     const data = await res.json();
 
     if (res.ok && data.success) {
-      alert('Logueado correctamente');
       localStorage.setItem('userId', data.userId);
+      localStorage.setItem('nombre', data.nombre);
 
       if (data.rol === 'nutricionista') {
         navigate('/dashboardN');
@@ -49,6 +49,7 @@ const LoginForm: React.FC = () => {
       } else {
         alert('No se pudo determinar el tipo de usuario');
       }
+
     } else {
       alert(data.message || 'Error al iniciar sesión');
     }

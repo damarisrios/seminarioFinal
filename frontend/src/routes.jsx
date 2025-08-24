@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import UserTypeSelection from "./components/userType";
-import LoginRegistrationForm from "./components/login";
+import LoginForm from "./components/login";
 import UserMeasures from "./components/userMeasures";
 import NutritionistFile from "./components/nutriFile";
 import EditData from "./components/editData";
@@ -17,7 +17,7 @@ import HomePage from "./components/home";
 const RoutesComponent = () => {
     return ( <Routes>
         <Route path="/register" element={<RegistrationForm/>}/>
-        <Route path="/login" element={<LoginRegistrationForm/>}/>
+        <Route path="/login" element={<LoginForm/>}/>
         <Route path="/" element={<HomePage/>}/>
         <Route path="/userType" element={<UserTypeSelection/>}/>
         <Route path="/userMeasures" element={<UserMeasures/>}/>

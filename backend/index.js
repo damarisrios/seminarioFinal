@@ -142,6 +142,7 @@ app.post('/login', async (req, res) => {
       success: true,
       message: 'Inicio de sesión exitoso',
       userId: usuarioId,
+      nombre: user.nombre,
       rol: rol
     });
   } catch (err) {
@@ -149,6 +150,53 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ success: false, message: 'Error del servidor' });
   }
 });
+
+// Obtener datos del usuario/paciente
+app.get('/paciente/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await db.query('SELECT * FROM Paciente WHERE usuario_id = ?', [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Paciente no encontrado' });
+    }
+
+    res.status(200).json({ success: true, paciente: rows[0] });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error al obtener paciente', error: error.message });
+  }
+});
+
+// Modificar los datos del usuario/paciente
+app.put('/paciente/:id', async (req, res) => {
+  const { id } = req.params;
+  const { altura, peso, imc, objetivo } = req.body;
+
+  if (!altura || !peso || !imc) {
+    return res.status(400).json({ success: false, message: "Faltan campos obligatorios" });
+  }
+
+  try {
+    const query = `
+      UPDATE Paciente
+      SET altura = ?, peso = ?, imc = ?, objetivo = ?
+      WHERE usuario_id = ?
+    `;
+    const values = [altura, peso, imc, objetivo || null, id];
+
+    const [result] = await db.query(query, values);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Paciente no encontrado' });
+    }
+
+    res.status(200).json({ success: true, message: 'Perfil actualizado correctamente' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error al actualizar paciente', error: error.message });
+  }
+});
+
+//Cambiar contraseña
 
 
 // Inicializar servidor
