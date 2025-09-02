@@ -5,13 +5,15 @@ import Toast from 'bootstrap/js/dist/toast';
 import { useNavigate } from 'react-router-dom';
 
 interface PasswordData {
+  newUsername: string;
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
 }
 
-const PasswordChange: React.FC = () => {
+const EditUser: React.FC = () => {
   const [formData, setFormData] = useState<PasswordData>({
+    newUsername: '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
@@ -28,8 +30,24 @@ const PasswordChange: React.FC = () => {
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  e.preventDefault();
 
+  const userId = localStorage.getItem('userId');
+  if (!userId) {
+    setError('No se encontró la sesión del usuario. Volvé a iniciar sesión.');
+    return;
+  }
+
+  // Construir payload dinámico
+  const payload: any = {};
+
+  // Si quiere cambiar nombre de usuario
+  if (formData.newUsername.trim()) {
+    payload.new_username = formData.newUsername.trim();
+  }
+
+  // Si quiere cambiar contraseña
+  if (formData.newPassword || formData.confirmPassword || formData.currentPassword) {
     if (!formData.currentPassword) {
       setError('Ingresá tu contraseña actual');
       return;
@@ -43,43 +61,43 @@ const PasswordChange: React.FC = () => {
       return;
     }
 
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
-      setError('No se encontró la sesión del usuario. Volvé a iniciar sesión.');
+    payload.contrasena_actual = formData.currentPassword;
+    payload.contrasena_nueva = formData.newPassword;
+  }
+
+  if (Object.keys(payload).length === 0) {
+    setError('No ingresaste ningún cambio');
+    return;
+  }
+
+  try {
+    const res = await fetch(`http://localhost:3000/usuarios/${userId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      setError(data.message || 'No se pudo actualizar el usuario');
       return;
     }
 
-    try {
-      const res = await fetch(`http://localhost:3000/usuarios/${userId}/password`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contrasena_actual: formData.currentPassword,
-          contrasena_nueva: formData.newPassword,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        setError(data.message || 'No se pudo actualizar la contraseña');
-        return;
-      }
-
-      // === Igual que en editar usuario: toast y luego navigate ===
-      const toastEl = toastRef.current;
-      if (toastEl) {
-        const toast = new Toast(toastEl);
-        toast.show();
-        setTimeout(() => {
-          navigate('/dashboardU'); // mismo destino que usás en Modificar perfil
-        }, 2000);
-      }
-    } catch (err) {
-      console.error(err);
-      setError('Error en el servidor / red. Verificá que el backend esté corriendo.');
+    const toastEl = toastRef.current;
+    if (toastEl) {
+      const toast = new Toast(toastEl);
+      toast.show();
+      setTimeout(() => {
+        navigate('/dashboardU');
+      }, 2000);
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setError('Error en el servidor / red. Verificá que el backend esté corriendo.');
+  }
+};
+
 
   return (
     <div className="container min-vh-100 d-flex align-items-center justify-content-center">
@@ -97,8 +115,17 @@ const PasswordChange: React.FC = () => {
             <div className="col-md-6 d-flex flex-wrap align-content-center">
               <div className="p-4 w-100 div-form">
                 <h4 className="text-center mb-4"><strong>CAMBIAR CONTRASEÑA</strong></h4>
-
-                <form onSubmit={handleSubmit}>
+                <form autoComplete="no" onSubmit={handleSubmit}>
+                  <div className='mb-3'>
+                    <label htmlFor="" className='form-label'> Nombre de usuario</label>
+                    <input type="text" 
+                      className='form-control'
+                      id='newUsername'
+                      name='newUsername'
+                      value={formData.newUsername}
+                      onChange={handleChange}
+                    />
+                  </div>
                   <div className="mb-3">
                     <label htmlFor="currentPassword" className="form-label">Contraseña actual:</label>
                     <input
@@ -108,10 +135,8 @@ const PasswordChange: React.FC = () => {
                       name="currentPassword"
                       value={formData.currentPassword}
                       onChange={handleChange}
-                      required
                     />
                   </div>
-
                   <div className="mb-3">
                     <label htmlFor="newPassword" className="form-label">Nueva contraseña:</label>
                     <input
@@ -121,10 +146,8 @@ const PasswordChange: React.FC = () => {
                       name="newPassword"
                       value={formData.newPassword}
                       onChange={handleChange}
-                      required
                     />
                   </div>
-
                   <div className="mb-3">
                     <label htmlFor="confirmPassword" className="form-label">Confirmar nueva contraseña:</label>
                     <input
@@ -134,7 +157,6 @@ const PasswordChange: React.FC = () => {
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleChange}
-                      required
                     />
                   </div>
 
@@ -177,4 +199,4 @@ const PasswordChange: React.FC = () => {
   );
 };
 
-export default PasswordChange;
+export default EditUser;

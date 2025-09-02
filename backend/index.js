@@ -29,9 +29,9 @@ app.get('/test-db', async (req, res) => {
 app.post('/register', async (req, res) => {
   console.log("Datos recibidos:", JSON.stringify(req.body, null, 2));
 
-  const { nombre, apellido, edad, email, telefono, contraseña } = req.body;
+  const { nombre, apellido, nombre_usuario, edad, email, telefono, contraseña } = req.body;
 
-  if (!nombre || !apellido || !edad || !email || !contraseña) {
+  if (!nombre || !apellido || !nombre_usuario || !edad || !email || !contraseña) {
     return res.status(400).json({ success: false, message: "Todos los campos obligatorios deben completarse" });
   }
 
@@ -39,10 +39,10 @@ app.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(contraseña, 10);
 
     const query = `
-      INSERT INTO Usuario (nombre, apellido, edad, email, telefono, contraseña)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO Usuario (nombre, apellido, nombre_usuario, edad, email, telefono, contraseña)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    const values = [nombre, apellido, edad, email, telefono || null, hashedPassword];
+    const values = [nombre, apellido, nombre_usuario, edad, email, telefono || null, hashedPassword];
 
     const [result] = await db.query(query, values);
 
@@ -142,7 +142,7 @@ app.post('/login', async (req, res) => {
       success: true,
       message: 'Inicio de sesión exitoso',
       userId: usuarioId,
-      nombre: user.nombre,
+      username: user.nombre_usuario,
       rol: rol
     });
   } catch (err) {
@@ -196,60 +196,58 @@ app.put('/paciente/:id', async (req, res) => {
   }
 });
 
-//Cambiar contraseña
-app.put('/usuarios/:id/password', async (req, res) => {
+// Editar perfil, contraseña y/o nombre de usuario
+app.put('/usuarios/:id', async (req, res) => {
   const { id } = req.params;
-  // En el body usamos claves sin tilde para evitar problemas en JSON
-  const { contrasena_actual, contrasena_nueva } = req.body;
-
-  if (!contrasena_actual || !contrasena_nueva) {
-    return res.status(400).json({ success: false, message: 'Datos incompletos' });
-  }
-  if (contrasena_nueva.length < 6) {
-    return res.status(400).json({ success: false, message: 'La nueva contraseña debe tener al menos 6 caracteres' });
-  }
+  const { new_username, contrasena_actual, contrasena_nueva } = req.body;
 
   try {
-    // 1) Traer hash actual desde la columna `contraseña`
-    const [rows] = await db.query(
-      'SELECT `contraseña` FROM Usuario WHERE usuario_id = ? LIMIT 1',
-      [id]
-    );
-    if (!rows.length) {
-      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+    // Si quiere cambiar nombre de usuario
+    if (new_username) {
+      await db.query(
+        'UPDATE Usuario SET nombre_usuario = ? WHERE usuario_id = ?',
+        [new_username, id]
+      );
     }
 
-    const hashActual = rows[0]['contraseña']; // usar bracket notation por el tilde
-    if (!hashActual) {
-      return res.status(500).json({ success: false, message: 'Hash de contraseña no encontrado' });
+    // Si quiere cambiar contraseña
+    if (contrasena_nueva) {
+      if (!contrasena_actual) {
+        return res.status(400).json({ success: false, message: 'Falta la contraseña actual' });
+      }
+
+      const [rows] = await db.query(
+        'SELECT `contraseña` FROM Usuario WHERE usuario_id = ? LIMIT 1',
+        [id]
+      );
+      if (!rows.length) {
+        return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+      }
+
+      const hashActual = rows[0]['contraseña'];
+      const ok = await bcrypt.compare(contrasena_actual, hashActual);
+      if (!ok) {
+        return res.status(401).json({ success: false, message: 'La contraseña actual es incorrecta' });
+      }
+
+      if (contrasena_actual === contrasena_nueva) {
+        return res.status(400).json({ success: false, message: 'La nueva contraseña no puede ser igual a la actual' });
+      }
+
+      const newHash = await bcrypt.hash(contrasena_nueva, 10);
+      await db.query(
+        'UPDATE Usuario SET `contraseña` = ? WHERE usuario_id = ?',
+        [newHash, id]
+      );
     }
 
-    // 2) Verificar contraseña actual
-    const ok = await bcrypt.compare(contrasena_actual, hashActual);
-    if (!ok) {
-      return res.status(401).json({ success: false, message: 'La contraseña actual es incorrecta' });
-    }
-
-    if (contrasena_actual === contrasena_nueva) {
-      return res.status(400).json({ success: false, message: 'La nueva contraseña no puede ser igual a la actual' });
-    }
-
-    // 3) Hashear y guardar nueva contraseña
-    const newHash = await bcrypt.hash(contrasena_nueva, 10);
-    const [upd] = await db.query(
-      'UPDATE Usuario SET `contraseña` = ? WHERE usuario_id = ?',
-      [newHash, id]
-    );
-    if (upd.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: 'Usuario no encontrado al actualizar' });
-    }
-
-    return res.json({ success: true, message: 'Contraseña actualizada correctamente' });
+    return res.json({ success: true, message: 'Usuario actualizado correctamente' });
   } catch (error) {
-    console.error('Error actualizando contraseña:', error);
+    console.error('Error actualizando usuario:', error);
     return res.status(500).json({ success: false, message: 'Error del servidor' });
   }
 });
+
 
 
 // Inicializar servidor
