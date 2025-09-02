@@ -7,7 +7,7 @@ const UserTypeSelection: React.FC = () => {
   const [selectedType, setSelectedType] = useState<'user' | 'nutritionist' | null>(null);
 
   const handleSelectType = (type: 'user' | 'nutritionist') => {
-    localStorage.setItem('userType', type); // Opcional: guardar para usar después
+    localStorage.setItem('userType', type);
     setSelectedType(type);
   };
 

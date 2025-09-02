@@ -96,6 +96,7 @@ const UserMeasures: React.FC = () => {
         const userPayload = {
           nombre: baseData.firstName,
           apellido: baseData.lastName,
+          nombre_usuario: baseData.username,
           edad: baseData.age,
           email: baseData.email,
           telefono: baseData.phone || null,

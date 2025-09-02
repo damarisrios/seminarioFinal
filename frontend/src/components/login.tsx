@@ -40,7 +40,7 @@ const LoginForm: React.FC = () => {
 
     if (res.ok && data.success) {
       localStorage.setItem('userId', data.userId);
-      localStorage.setItem('nombre', data.nombre);
+      localStorage.setItem('username', data.username);
 
       if (data.rol === 'nutricionista') {
         navigate('/dashboardN');
