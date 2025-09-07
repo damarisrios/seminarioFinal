@@ -196,6 +196,25 @@ app.put('/paciente/:id', async (req, res) => {
   }
 });
 
+// Buscar usuario por nombre_usuario para modificar datos del paciente (nutri)
+app.get('/usuario-by-username/:username', async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    const [rows] = await db.query('SELECT usuario_id FROM Usuario WHERE nombre_usuario = ?', [username]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+    }
+
+    res.json({ success: true, usuario_id: rows[0].usuario_id });
+  } catch (error) {
+    console.error('Error al buscar usuario:', error);
+    res.status(500).json({ success: false, message: 'Error en el servidor' });
+  }
+});
+
+
 // Editar perfil, contraseña y/o nombre de usuario
 app.put('/usuarios/:id', async (req, res) => {
   const { id } = req.params;

@@ -1,6 +1,6 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useNavigate } from 'react-router-dom'; // ✅ agregado
+import { useNavigate } from 'react-router-dom';
 
 interface Recipe {
   id: number;
