@@ -9,10 +9,11 @@ import AddContent from "./components/addContent";
 import NutritionistDashboard from "./components/nutriDashboard";
 import UserDashboard from "./components/userDashboard";
 import EditMeasures from "./components/changeUsername";
-import PasswordChange from "./components/changePassword";
+import EditUser from "./components/editProfile";
 import ContentViewN from "./components/contentViewNutri";
 import ContentViewU from "./components/contentViewUser";
 import HomePage from "./components/home";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const RoutesComponent = () => {
     return ( <Routes>
@@ -24,10 +25,24 @@ const RoutesComponent = () => {
         <Route path="/nutriFile" element={<NutritionistFile/>}/>
         <Route path="/editData" element={<EditData/>}/>
         <Route path="/addContent" element={<AddContent/>}/>
-        <Route path="/dashboardN" element={<NutritionistDashboard/>}/>
-        <Route path="/dashboardU" element={<UserDashboard/>}/>
+        <Route
+            path="/dashboardN"
+            element={
+                <ProtectedRoute allowedRoles={['nutricionista']} redirectTo="/dashboardU">
+                <NutritionistDashboard />
+                </ProtectedRoute>
+            }
+        />
+        <Route
+            path="/dashboardU"
+            element={
+                <ProtectedRoute allowedRoles={['paciente']} redirectTo="/dashboardN">
+                <UserDashboard />
+                </ProtectedRoute>
+            }
+        />
         <Route path="/editMeasures" element={<EditMeasures/>}/>
-        <Route path="/changePassword" element={<PasswordChange/>}/>
+        <Route path="/editProfile" element={<EditUser/>}/>
         <Route path="/contentViewN" element={<ContentViewN/>}/>
         <Route path="/contentViewU" element={<ContentViewU/>}/>
         <Route path="/home" element={<HomePage/>}/>

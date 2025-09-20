@@ -1,6 +1,6 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useNavigate } from 'react-router-dom'; // ✅ agregado
+import { useNavigate } from 'react-router-dom';
 
 interface Recipe {
   id: number;
@@ -25,14 +25,14 @@ const UserDashboard: React.FC<HealthDashboardProps> = ({
   assignedTips = [],
 }) => {
   const navigate = useNavigate();
-  const userName = localStorage.getItem('nombre') || 'Usuario';
+  const userName = localStorage.getItem('username') || 'Usuario';
 
   const handleModifyProfile = () => {
     navigate('/userMeasures');
   };
 
   const handleModifyPass = () => {
-    navigate('/changePassword');
+    navigate('/editProfile');
   };
 
   return (
@@ -51,13 +51,13 @@ const UserDashboard: React.FC<HealthDashboardProps> = ({
                 className="btn btn-outline-dark w-100 d-flex align-items-center justify-content-center gap-2"
                 onClick={handleModifyProfile}
               >
-                <span className="material-symbols-outlined">edit</span>
-                Modificar perfil
+                <span className="material-symbols-outlined">table_edit</span>
+                Modificar datos
               </button>
               <button className="btn btn-outline-dark w-100 d-flex align-items-center justify-content-center gap-2"
                 onClick={handleModifyPass}>
-                <span className="material-symbols-outlined">lock</span>
-                Cambiar contraseña
+                <span className="material-symbols-outlined">person_edit</span>
+                Editar perfil
               </button>
             </div>
           </div>

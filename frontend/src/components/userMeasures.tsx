@@ -9,13 +9,15 @@ interface UserFormData {
   peso: string;
   altura: string;
   objetivo: string;
+  username?: string;
 }
 
 const UserMeasures: React.FC = () => {
   const [formData, setFormData] = useState<UserFormData>({
     peso: '',
     altura: '',
-    objetivo: ''
+    objetivo: '',
+    username: ''
   });
 
   const [modoEdicion, setModoEdicion] = useState(false);
@@ -60,9 +62,24 @@ const UserMeasures: React.FC = () => {
     const imc = peso / Math.pow(altura / 100, 2);
 
     try {
-      if (modoEdicion && userId) {
+      if (modoEdicion) {
+        let targetUserId = userId;
+        
+        // Si es nutricionista, buscar ID del usuario por nombre de usuario
+        if (localStorage.getItem('rol') === 'nutricionista') {
+          const userRes = await fetch(`http://localhost:3000/usuario-by-username/${formData.username}`);
+          const userData = await userRes.json();
+
+          if (!userData.success) {
+            alert('Usuario no encontrado');
+            return;
+          }
+
+          targetUserId = userData.usuario_id;
+        }
+
         // MODIFICAR PERFIL
-        const response = await fetch(`http://localhost:3000/paciente/${userId}`, {
+        const response = await fetch(`http://localhost:3000/paciente/${targetUserId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ altura, peso, imc, objetivo: formData.objetivo })
@@ -76,13 +93,11 @@ const UserMeasures: React.FC = () => {
         }
 
         const toastEl = toastRef.current;
+        
         if (toastEl) {
           const toast = new Toast(toastEl);
           toast.show();
-
-          setTimeout(() => {
-            navigate('/dashboardU');
-          }, 2000);
+          setTimeout(() => navigate('/dashboardU'), 2000);
         }
       } else {
         // REGISTRO NUEVO
@@ -96,6 +111,7 @@ const UserMeasures: React.FC = () => {
         const userPayload = {
           nombre: baseData.firstName,
           apellido: baseData.lastName,
+          nombre_usuario: baseData.username,
           edad: baseData.age,
           email: baseData.email,
           telefono: baseData.phone || null,
@@ -162,8 +178,21 @@ const UserMeasures: React.FC = () => {
             </div>
             <div className="col-md-6 d-flex flex-wrap align-content-center">
               <div className="p-4 w-100 div-form">
-                <h2 className="text-center mb-4">{modoEdicion ? 'MODIFICAR PERFIL' : 'USUARIO'}</h2>
+                <h2 className="text-center mb-4">{modoEdicion ? 'MODIFICAR DATOS' : 'USUARIO'}</h2>
                 <form onSubmit={handleSubmit}>
+                    {localStorage.getItem('rol') === 'nutricionista' ? (
+                      <div className="mb-3">
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Nombre de usuario"
+                          name="username"
+                          value={formData.username}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+                    ) : null}
                   <div className="mb-3">
                     <input
                       type="number"
